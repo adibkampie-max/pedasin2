@@ -1,0 +1,1243 @@
+:root{
+    --primary:#e63946;
+    --primary-dark:#b91c2b;
+    --orange:#ff7b00;
+    --yellow:#ffb703;
+    --green:#20c76a;
+    --blue:#2196f3;
+    --bg:#f7f7f8;
+    --card:#fff;
+    --text:#202124;
+    --muted:#777;
+    --border:#eee;
+    --shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:
+        radial-gradient(circle at 10% 10%,rgba(230,57,70,.08),transparent 25%),
+        radial-gradient(circle at 90% 30%,rgba(255,123,0,.08),transparent 25%),
+        var(--bg);
+    color:var(--text);
+    max-width:600px;
+    margin:auto;
+    min-height:100vh;
+    overflow-x:hidden;
+}
+
+/* ================= LOADING ================= */
+
+#loading{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    background:linear-gradient(135deg,#e63946,#b91c2b,#ff7b00);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    color:white;
+    animation:loadingFade 1s ease 2.3s forwards;
+}
+
+.loader-logo{
+    font-size:65px;
+    animation:logoSpin 1.5s infinite ease-in-out;
+}
+
+.loader-title{
+    font-size:30px;
+    font-weight:900;
+    margin-top:10px;
+    animation:pulse 1s infinite;
+}
+
+.loader-bar{
+    width:220px;
+    height:7px;
+    background:rgba(255,255,255,.3);
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:20px;
+}
+
+.loader-progress{
+    height:100%;
+    width:0;
+    background:white;
+    animation:loadingProgress 2s ease forwards;
+}
+
+/* ================= PARTICLES ================= */
+
+.particle{
+    position:fixed;
+    z-index:-1;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:rgba(230,57,70,.18);
+    pointer-events:none;
+    animation:floatParticle linear infinite;
+}
+
+.p1{left:5%;animation-duration:9s;bottom:-20px}
+.p2{left:18%;animation-duration:12s;bottom:-30px}
+.p3{left:40%;animation-duration:10s;bottom:-20px}
+.p4{left:65%;animation-duration:14s;bottom:-30px}
+.p5{left:85%;animation-duration:11s;bottom:-20px}
+.p6{left:50%;animation-duration:16s;bottom:-30px}
+
+/* ================= TOPBAR ================= */
+
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    height:70px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 12px;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(15px);
+    border-bottom:1px solid var(--border);
+}
+
+.logo{
+    font-weight:1000;
+    font-size:20px;
+    color:var(--primary);
+    white-space:nowrap;
+    animation:logoFloat 3s ease-in-out infinite;
+}
+
+.logo span{
+    display:inline-block;
+    animation:pepperMove 2s ease-in-out infinite;
+}
+
+.search{
+    flex:1;
+    position:relative;
+}
+
+.search input{
+    width:100%;
+    border:1px solid var(--border);
+    border-radius:30px;
+    padding:12px 15px;
+    outline:none;
+    background:#f4f4f5;
+    transition:.3s;
+}
+
+.search input:focus{
+    transform:scale(1.02);
+    box-shadow:0 0 0 4px rgba(230,57,70,.12);
+}
+
+.icon-btn{
+    border:0;
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:white;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    position:relative;
+    transition:.25s;
+}
+
+.icon-btn:hover{
+    transform:translateY(-4px) rotate(5deg);
+}
+
+.icon-btn:active{
+    transform:scale(.85);
+}
+
+.badge-count{
+    position:absolute;
+    top:-4px;
+    right:-4px;
+    min-width:19px;
+    height:19px;
+    padding:0 5px;
+    background:var(--primary);
+    color:white;
+    border-radius:20px;
+    font-size:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    animation:badgePulse 1.5s infinite;
+}
+
+/* ================= RUNNING PROMO ================= */
+
+.marquee{
+    overflow:hidden;
+    background:linear-gradient(90deg,#e63946,#ff7b00,#e63946);
+    color:white;
+    white-space:nowrap;
+    font-weight:bold;
+    font-size:13px;
+}
+
+.marquee-track{
+    display:inline-block;
+    padding:9px 0;
+    padding-left:100%;
+    animation:marquee 15s linear infinite;
+}
+
+/* ================= PAGE ================= */
+
+.page{
+    display:none;
+    padding:15px;
+    padding-bottom:100px;
+    animation:pageIn .45s ease;
+}
+
+.page.active{
+    display:block;
+}
+
+/* ================= HERO ================= */
+
+.hero{
+    position:relative;
+    overflow:hidden;
+    border-radius:28px;
+    padding:28px 20px;
+    color:white;
+    background:
+        linear-gradient(135deg,rgba(230,57,70,.96),rgba(185,28,43,.96),rgba(255,123,0,.94));
+    box-shadow:0 15px 40px rgba(230,57,70,.25);
+    margin-bottom:20px;
+}
+
+.hero:before,
+.hero:after{
+    content:"";
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,.12);
+    animation:heroBubble 6s ease-in-out infinite;
+}
+
+.hero:before{
+    width:150px;
+    height:150px;
+    right:-50px;
+    top:-50px;
+}
+
+.hero:after{
+    width:90px;
+    height:90px;
+    left:-30px;
+    bottom:-30px;
+    animation-delay:1s;
+}
+
+.hero-content{
+    position:relative;
+    z-index:2;
+}
+
+.hero h1{
+    font-size:34px;
+    line-height:1.05;
+    margin-bottom:10px;
+    animation:heroText .8s ease;
+}
+
+.hero p{
+    opacity:.9;
+    margin-bottom:18px;
+}
+
+.hero-pepper{
+    position:absolute;
+    right:20px;
+    bottom:15px;
+    font-size:70px;
+    animation:pepperHero 3s ease-in-out infinite;
+}
+
+.btn{
+    border:0;
+    border-radius:14px;
+    padding:12px 17px;
+    cursor:pointer;
+    font-weight:800;
+    transition:.25s;
+}
+
+.btn-primary{
+    background:white;
+    color:var(--primary);
+    box-shadow:0 8px 20px rgba(0,0,0,.12);
+}
+
+.btn-primary:hover{
+    transform:translateY(-4px) scale(1.03);
+}
+
+.btn-primary:active,
+.btn-red:active{
+    transform:scale(.92);
+}
+
+.btn-red{
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+    color:white;
+    box-shadow:0 8px 20px rgba(230,57,70,.22);
+}
+
+.btn-red:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 25px rgba(230,57,70,.35);
+}
+
+/* ================= SECTION ================= */
+
+.section-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:22px 0 12px;
+}
+
+.section-title h2{
+    font-size:20px;
+}
+
+.section-title span{
+    color:var(--primary);
+    font-size:13px;
+    cursor:pointer;
+}
+
+/* ================= CATEGORY ================= */
+
+.categories{
+    display:flex;
+    gap:9px;
+    overflow-x:auto;
+    padding:5px 0 10px;
+    scrollbar-width:none;
+}
+
+.categories::-webkit-scrollbar{
+    display:none;
+}
+
+.category{
+    flex:0 0 auto;
+    padding:10px 15px;
+    border:1px solid var(--border);
+    background:var(--card);
+    border-radius:25px;
+    cursor:pointer;
+    font-size:13px;
+    transition:.3s;
+}
+
+.category:hover{
+    transform:translateY(-3px);
+}
+
+.category.active{
+    background:var(--primary);
+    color:white;
+    border-color:var(--primary);
+    box-shadow:0 5px 15px rgba(230,57,70,.25);
+}
+
+/* ================= PRODUCT GRID ================= */
+
+.products{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.product{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:20px;
+    overflow:hidden;
+    position:relative;
+    box-shadow:var(--shadow);
+    opacity:0;
+    animation:productIn .6s ease forwards;
+    transition:.35s;
+}
+
+.product:hover{
+    transform:translateY(-7px) rotateX(2deg);
+    box-shadow:0 18px 35px rgba(0,0,0,.14);
+}
+
+.product-image{
+    height:145px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:67px;
+    background:
+        linear-gradient(135deg,
+        rgba(230,57,70,.08),
+        rgba(255,123,0,.14));
+    position:relative;
+    overflow:hidden;
+}
+
+.product-image:after{
+    content:"";
+    position:absolute;
+    width:80px;
+    height:180px;
+    background:rgba(255,255,255,.25);
+    transform:rotate(30deg);
+    left:-100px;
+    animation:shine 4s infinite;
+}
+
+.product-emoji{
+    position:relative;
+    z-index:2;
+    animation:foodFloat 3s ease-in-out infinite;
+}
+
+.wish-btn{
+    position:absolute;
+    top:9px;
+    right:9px;
+    z-index:4;
+    border:0;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:white;
+    box-shadow:0 5px 15px rgba(0,0,0,.12);
+    cursor:pointer;
+    transition:.25s;
+}
+
+.wish-btn:hover{
+    transform:scale(1.15);
+}
+
+.product-info{
+    padding:12px;
+}
+
+.product-name{
+    font-weight:800;
+    font-size:14px;
+    min-height:36px;
+}
+
+.product-price{
+    color:var(--primary);
+    font-weight:900;
+    margin:6px 0;
+}
+
+.stock{
+    color:var(--muted);
+    font-size:11px;
+    margin-bottom:8px;
+}
+
+.rating{
+    font-size:11px;
+    margin-bottom:9px;
+}
+
+.product-bottom{
+    display:flex;
+    align-items:center;
+    gap:7px;
+}
+
+.product-bottom .btn{
+    flex:1;
+    padding:10px 7px;
+    font-size:12px;
+}
+
+.badge{
+    position:absolute;
+    top:10px;
+    left:10px;
+    z-index:5;
+    background:var(--orange);
+    color:white;
+    padding:5px 8px;
+    border-radius:8px;
+    font-size:9px;
+    font-weight:900;
+    animation:badgeGlow 1.8s infinite;
+}
+
+/* ================= PROMO ================= */
+
+.promo-grid{
+    display:grid;
+    gap:13px;
+}
+
+.promo-card{
+    min-height:125px;
+    border-radius:22px;
+    padding:18px;
+    color:white;
+    position:relative;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    animation:promoFloat 4s ease-in-out infinite;
+}
+
+.promo-card:nth-child(2){
+    animation-delay:.6s;
+}
+
+.promo-card:nth-child(3){
+    animation-delay:1.2s;
+}
+
+.promo-card:after{
+    content:"🔥";
+    position:absolute;
+    right:18px;
+    bottom:8px;
+    font-size:60px;
+    opacity:.25;
+    animation:fireMove 1.5s infinite;
+}
+
+.promo-red{
+    background:linear-gradient(135deg,#e63946,#b91c2b);
+}
+
+.promo-orange{
+    background:linear-gradient(135deg,#ff7b00,#ffb703);
+}
+
+.promo-green{
+    background:linear-gradient(135deg,#20c76a,#0b9b4b);
+}
+
+.promo-code{
+    display:inline-block;
+    margin-top:10px;
+    background:rgba(255,255,255,.2);
+    border:1px dashed white;
+    padding:7px 12px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+/* ================= PACKAGE ================= */
+
+.package-grid{
+    display:grid;
+    gap:13px;
+}
+
+.package{
+    background:var(--card);
+    padding:18px;
+    border-radius:22px;
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+    transition:.3s;
+    animation:packageIn .6s ease forwards;
+}
+
+.package:hover{
+    transform:translateX(5px);
+}
+
+.package:before{
+    content:"🎁";
+    position:absolute;
+    right:15px;
+    top:15px;
+    font-size:42px;
+    animation:giftMove 2.5s infinite;
+}
+
+.package h3{
+    margin-bottom:7px;
+}
+
+.package-price{
+    color:var(--primary);
+    font-size:20px;
+    font-weight:900;
+    margin:10px 0;
+}
+
+/* ================= CART ================= */
+
+.cart-item{
+    background:var(--card);
+    padding:13px;
+    border-radius:18px;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    animation:cartIn .4s ease;
+}
+
+.cart-icon{
+    width:55px;
+    height:55px;
+    border-radius:15px;
+    background:#fff1f2;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+}
+
+.cart-info{
+    flex:1;
+}
+
+.cart-name{
+    font-weight:800;
+    font-size:13px;
+}
+
+.cart-price{
+    color:var(--primary);
+    font-weight:bold;
+    font-size:13px;
+}
+
+.qty{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-top:6px;
+}
+
+.qty button{
+    width:27px;
+    height:27px;
+    border:0;
+    border-radius:8px;
+    background:#eee;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.cart-summary{
+    background:var(--card);
+    border-radius:20px;
+    padding:17px;
+    margin-top:15px;
+    box-shadow:var(--shadow);
+}
+
+.summary-row{
+    display:flex;
+    justify-content:space-between;
+    margin:9px 0;
+}
+
+.total{
+    border-top:1px solid var(--border);
+    padding-top:12px;
+    font-size:19px;
+    font-weight:900;
+}
+
+/* ================= FORM ================= */
+
+.form-group{
+    margin-bottom:12px;
+}
+
+.form-group label{
+    display:block;
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+.form-control{
+    width:100%;
+    padding:12px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    outline:none;
+    background:var(--card);
+    color:var(--text);
+}
+
+.form-control:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 4px rgba(230,57,70,.1);
+}
+
+/* ================= EMPTY ================= */
+
+.empty{
+    text-align:center;
+    padding:45px 20px;
+    color:var(--muted);
+}
+
+.empty-icon{
+    font-size:60px;
+    animation:emptyFloat 2s infinite;
+}
+
+/* ================= ORDER ================= */
+
+.status-box{
+    background:var(--card);
+    padding:22px;
+    border-radius:22px;
+    box-shadow:var(--shadow);
+}
+
+.status-line{
+    display:flex;
+    gap:14px;
+    margin:20px 0;
+    align-items:center;
+}
+
+.status-dot{
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:#ddd;
+}
+
+.status-dot.active{
+    background:var(--green);
+    animation:statusPulse 1.5s infinite;
+}
+
+.status-line.active strong{
+    color:var(--green);
+}
+
+/* ================= PROFILE ================= */
+
+.profile-card{
+    background:linear-gradient(135deg,#e63946,#ff7b00);
+    color:white;
+    border-radius:25px;
+    padding:25px;
+    box-shadow:0 15px 35px rgba(230,57,70,.2);
+    animation:profileFloat 4s infinite;
+}
+
+.avatar{
+    width:75px;
+    height:75px;
+    background:white;
+    color:var(--primary);
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:35px;
+    margin-bottom:15px;
+}
+
+/* ================= ADMIN ================= */
+
+.admin-box{
+    background:var(--card);
+    border-radius:20px;
+    padding:17px;
+    margin-bottom:12px;
+    box-shadow:var(--shadow);
+}
+
+.admin-product{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid var(--border);
+}
+
+.admin-product input{
+    width:80px;
+    padding:7px;
+    border:1px solid var(--border);
+    border-radius:8px;
+}
+
+/* ================= CHAT ================= */
+
+.chat-window{
+    position:fixed;
+    z-index:5000;
+    right:15px;
+    bottom:80px;
+    width:min(360px,calc(100vw - 30px));
+    background:var(--card);
+    border-radius:22px;
+    box-shadow:0 20px 60px rgba(0,0,0,.2);
+    overflow:hidden;
+    display:none;
+    transform-origin:bottom right;
+}
+
+.chat-window.open{
+    display:block;
+    animation:chatOpen .35s ease;
+}
+
+.chat-header{
+    padding:15px;
+    color:white;
+    background:linear-gradient(135deg,var(--primary),var(--orange));
+    font-weight:900;
+}
+
+.chat-body{
+    padding:15px;
+    height:250px;
+    overflow:auto;
+}
+
+.chat-message{
+    max-width:85%;
+    background:#f1f1f1;
+    padding:10px;
+    border-radius:13px;
+    margin-bottom:8px;
+    font-size:13px;
+    animation:messageIn .3s ease;
+}
+
+.chat-message.bot{
+    border-bottom-left-radius:3px;
+}
+
+.chat-message.user{
+    margin-left:auto;
+    background:#ffe4e6;
+    border-bottom-right-radius:3px;
+}
+
+.chat-input{
+    display:flex;
+    padding:10px;
+    gap:7px;
+    border-top:1px solid var(--border);
+}
+
+.chat-input input{
+    flex:1;
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:10px;
+    outline:none;
+}
+
+.chat-send{
+    border:0;
+    background:var(--primary);
+    color:white;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+}
+
+/* ================= FLOAT CHAT ================= */
+
+.chat-float{
+    position:fixed;
+    right:18px;
+    bottom:78px;
+    z-index:4000;
+    width:54px;
+    height:54px;
+    border:0;
+    border-radius:50%;
+    background:linear-gradient(135deg,#20c76a,#0b9b4b);
+    color:white;
+    font-size:25px;
+    box-shadow:0 10px 25px rgba(0,0,0,.2);
+    cursor:pointer;
+    animation:chatFloat 2s infinite;
+}
+
+/* ================= NOTIFICATION ================= */
+
+.toast{
+    position:fixed;
+    z-index:10000;
+    left:50%;
+    bottom:95px;
+    transform:translate(-50%,120px);
+    background:#202124;
+    color:white;
+    padding:12px 17px;
+    border-radius:15px;
+    font-size:13px;
+    opacity:0;
+    transition:.4s;
+    max-width:90%;
+}
+
+.toast.show{
+    transform:translate(-50%,0);
+    opacity:1;
+}
+
+/* ================= LIVE NOTIFICATION ================= */
+
+.live-notification{
+    position:fixed;
+    z-index:3500;
+    left:15px;
+    bottom:85px;
+    background:var(--card);
+    padding:11px 14px;
+    border-radius:15px;
+    box-shadow:0 12px 35px rgba(0,0,0,.15);
+    font-size:12px;
+    transform:translateX(-140%);
+    transition:.5s;
+    max-width:260px;
+}
+
+.live-notification.show{
+    transform:translateX(0);
+}
+
+/* ================= BOTTOM NAV ================= */
+
+.bottom-nav{
+    position:fixed;
+    z-index:2000;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(600px,100%);
+    height:67px;
+    background:rgba(255,255,255,.96);
+    backdrop-filter:blur(15px);
+    border-top:1px solid var(--border);
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+}
+
+.nav-btn{
+    border:0;
+    background:none;
+    cursor:pointer;
+    color:#888;
+    font-size:10px;
+    transition:.3s;
+}
+
+.nav-btn .nav-icon{
+    display:block;
+    font-size:21px;
+    margin-bottom:2px;
+    transition:.3s;
+}
+
+.nav-btn.active{
+    color:var(--primary);
+    font-weight:900;
+}
+
+.nav-btn.active .nav-icon{
+    transform:translateY(-5px) scale(1.15);
+}
+
+/* ================= DARK MODE ================= */
+
+body.dark{
+    --bg:#101114;
+    --card:#191b20;
+    --text:#f4f4f5;
+    --muted:#aaa;
+    --border:#292c33;
+    --shadow:0 10px 30px rgba(0,0,0,.3);
+}
+
+body.dark .topbar,
+body.dark .bottom-nav{
+    background:rgba(20,21,25,.94);
+}
+
+body.dark .search input{
+    background:#24262c;
+    color:white;
+}
+
+body.dark .icon-btn{
+    background:#24262c;
+    color:white;
+}
+
+body.dark .cart-icon{
+    background:#302124;
+}
+
+body.dark .category{
+    background:#191b20;
+}
+
+body.dark .category.active{
+    background:var(--primary);
+}
+
+body.dark .wish-btn{
+    background:#24262c;
+}
+
+/* ================= ANIMATIONS ================= */
+
+@keyframes loadingProgress{
+    from{width:0}
+    to{width:100%}
+}
+
+@keyframes loadingFade{
+    to{
+        opacity:0;
+        visibility:hidden;
+        pointer-events:none;
+    }
+}
+
+@keyframes logoSpin{
+    0%,100%{transform:rotate(-10deg) scale(1)}
+    50%{transform:rotate(10deg) scale(1.15)}
+}
+
+@keyframes pulse{
+    50%{transform:scale(1.04)}
+}
+
+@keyframes floatParticle{
+    0%{transform:translateY(0) rotate(0);opacity:0}
+    10%{opacity:1}
+    100%{transform:translateY(-110vh) rotate(720deg);opacity:0}
+}
+
+@keyframes logoFloat{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-3px)}
+}
+
+@keyframes pepperMove{
+    0%,100%{transform:rotate(-12deg)}
+    50%{transform:rotate(12deg) scale(1.08)}
+}
+
+@keyframes badgePulse{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.12)}
+}
+
+@keyframes marquee{
+    to{transform:translateX(-100%)}
+}
+
+@keyframes pageIn{
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@keyframes heroText{
+    from{
+        opacity:0;
+        transform:translateX(-30px);
+    }
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+
+@keyframes heroBubble{
+    0%,100%{transform:translate(0,0) scale(1)}
+    50%{transform:translate(-20px,20px) scale(1.15)}
+}
+
+@keyframes pepperHero{
+    0%,100%{
+        transform:rotate(-10deg) translateY(0);
+    }
+    50%{
+        transform:rotate(10deg) translateY(-15px);
+    }
+}
+
+@keyframes productIn{
+    from{
+        opacity:0;
+        transform:translateY(35px) scale(.92);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+@keyframes foodFloat{
+    0%,100%{transform:translateY(0) rotate(-2deg)}
+    50%{transform:translateY(-8px) rotate(2deg)}
+}
+
+@keyframes shine{
+    0%{left:-100px}
+    50%,100%{left:130%}
+}
+
+@keyframes badgeGlow{
+    0%,100%{
+        box-shadow:0 0 0 rgba(255,123,0,0);
+    }
+    50%{
+        box-shadow:0 0 15px rgba(255,123,0,.65);
+    }
+}
+
+@keyframes promoFloat{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-5px)}
+}
+
+@keyframes fireMove{
+    0%,100%{transform:rotate(-5deg) scale(1)}
+    50%{transform:rotate(5deg) scale(1.12)}
+}
+
+@keyframes giftMove{
+    0%,100%{transform:rotate(0) translateY(0)}
+    50%{transform:rotate(8deg) translateY(-5px)}
+}
+
+@keyframes packageIn{
+    from{
+        opacity:0;
+        transform:translateX(-25px);
+    }
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+
+@keyframes cartIn{
+    from{
+        opacity:0;
+        transform:translateX(30px);
+    }
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+
+@keyframes emptyFloat{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-10px)}
+}
+
+@keyframes statusPulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(32,199,106,.4)}
+    50%{box-shadow:0 0 0 10px rgba(32,199,106,0)}
+}
+
+@keyframes profileFloat{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-4px)}
+}
+
+@keyframes chatOpen{
+    from{
+        opacity:0;
+        transform:scale(.7) translateY(30px);
+    }
+    to{
+        opacity:1;
+        transform:scale(1) translateY(0);
+    }
+}
+
+@keyframes messageIn{
+    from{
+        opacity:0;
+        transform:translateY(8px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@keyframes chatFloat{
+    0%,100%{
+        transform:scale(1);
+    }
+    50%{
+        transform:scale(1.08);
+        box-shadow:0 0 0 10px rgba(32,199,106,.12);
+    }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:420px){
+    .products{
+        gap:9px;
+    }
+
+    .product-image{
+        height:130px;
+        font-size:58px;
+    }
+
+    .hero h1{
+        font-size:29px;
+    }
+}
