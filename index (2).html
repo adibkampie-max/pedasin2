@@ -1,0 +1,439 @@
+!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌶️ PEDASIN SHOP PREMIUM</title>
+
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+
+<body>
+
+<!-- LOADING -->
+<div id="loading">
+    <div class="loader-logo">🌶️</div>
+    <div class="loader-title">PEDASIN</div>
+    <div>SHOP PREMIUM</div>
+    <div class="loader-bar">
+        <div class="loader-progress"></div>
+    </div>
+</div>
+
+<!-- PARTICLES -->
+<div class="particle p1"></div>
+<div class="particle p2"></div>
+<div class="particle p3"></div>
+<div class="particle p4"></div>
+<div class="particle p5"></div>
+<div class="particle p6"></div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+    <div class="logo"><span>🌶️</span> PEDASIN</div>
+
+    <div class="search">
+        <input
+            id="searchInput"
+            type="search"
+            placeholder="Cari camilan..."
+            oninput="searchProducts(this.value)">
+    </div>
+
+    <button class="icon-btn" onclick="toggleDark()" title="Mode">
+        🌙
+    </button>
+
+    <button class="icon-btn" onclick="showPage('wishlistPage')" title="Wishlist">
+        ❤️
+        <span class="badge-count" id="wishBadge">0</span>
+    </button>
+
+    <button class="icon-btn" onclick="showPage('cartPage')" title="Keranjang">
+        🛒
+        <span class="badge-count" id="cartBadge">0</span>
+    </button>
+</header>
+
+<!-- MARQUEE -->
+<div class="marquee">
+    <div class="marquee-track">
+        🔥 PEDASIN PREMIUM • PROMO HARI INI • GRATIS ONGKIR MINIMAL BELANJA • 🌶️ CAMILAN FAVORIT • 🎁 PAKET HEMAT •
+    </div>
+</div>
+
+<!-- ================= HOME ================= -->
+
+<section id="homePage" class="page active">
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Camilan Pedas,<br>Rasa Nggak Main-main! 🌶️</h1>
+            <p>Nikmati camilan favorit dengan berbagai pilihan rasa.</p>
+            <button class="btn btn-primary" onclick="showPage('productsPage')">
+                🛍️ Belanja Sekarang
+            </button>
+        </div>
+
+        <div class="hero-pepper">🌶️</div>
+    </div>
+
+    <div class="section-title">
+        <h2>🔥 Kategori</h2>
+        <span onclick="showPage('productsPage')">Lihat Semua</span>
+    </div>
+
+    <div class="categories">
+        <button class="category active" onclick="filterCategory('Semua',this)">Semua</button>
+        <button class="category" onclick="filterCategory('Camilan',this)">🍿 Camilan</button>
+        <button class="category" onclick="filterCategory('Minuman',this)">🥤 Minuman</button>
+        <button class="category" onclick="filterCategory('Favorit',this)">❤️ Favorit</button>
+        <button class="category" onclick="filterCategory('Baru',this)">✨ Baru</button>
+    </div>
+
+    <div class="section-title">
+        <h2>⭐ Produk Pilihan</h2>
+        <span onclick="showPage('productsPage')">Lihat Semua →</span>
+    </div>
+
+    <div id="homeProducts" class="products"></div>
+
+    <div class="section-title">
+        <h2>🎁 Promo</h2>
+    </div>
+
+    <div class="promo-grid">
+        <div class="promo-card promo-red">
+            <h3>🔥 Hemat 10%</h3>
+            <p>Gunakan kode promo spesial.</p>
+            <div class="promo-code">PEDAS10</div>
+        </div>
+
+        <div class="promo-card promo-orange">
+            <h3>🌶️ Pedas Favorit</h3>
+            <p>Pilihan camilan paling banyak diminati.</p>
+        </div>
+
+        <div class="promo-card promo-green">
+            <h3>🎁 Paket Hemat</h3>
+            <p>Dapatkan lebih banyak dengan harga lebih hemat.</p>
+        </div>
+    </div>
+
+</section>
+
+<!-- ================= PRODUCTS ================= -->
+
+<section id="productsPage" class="page">
+
+    <div class="section-title">
+        <h2>🛍️ Semua Produk</h2>
+        <span id="productCount">72 produk</span>
+    </div>
+
+    <div class="categories">
+        <button class="category active" onclick="filterCategory('Semua',this)">Semua</button>
+        <button class="category" onclick="filterCategory('Camilan',this)">Camilan</button>
+        <button class="category" onclick="filterCategory('Minuman',this)">Minuman</button>
+        <button class="category" onclick="filterCategory('Favorit',this)">Favorit</button>
+        <button class="category" onclick="filterCategory('Baru',this)">Baru</button>
+    </div>
+
+    <div id="productsGrid" class="products"></div>
+
+</section>
+
+<!-- ================= WISHLIST ================= -->
+
+<section id="wishlistPage" class="page">
+
+    <div class="section-title">
+        <h2>❤️ Wishlist Saya</h2>
+    </div>
+
+    <div id="wishlistGrid" class="products"></div>
+
+</section>
+
+<!-- ================= PROMO ================= -->
+
+<section id="promoPage" class="page">
+
+    <div class="section-title">
+        <h2>🔥 Promo PEDASIN</h2>
+    </div>
+
+    <div class="promo-grid">
+
+        <div class="promo-card promo-red">
+            <h2>PEDAS10</h2>
+            <p>Diskon 10%</p>
+            <div class="promo-code">Minimal Rp30.000</div>
+        </div>
+
+        <div class="promo-card promo-orange">
+            <h2>HEMAT5</h2>
+            <p>Potongan Rp5.000</p>
+            <div class="promo-code">Minimal Rp40.000</div>
+        </div>
+
+        <div class="promo-card promo-green">
+            <h2>WELCOME</h2>
+            <p>Diskon Rp3.000 untuk pesanan pertama.</p>
+            <div class="promo-code">Minimal Rp20.000</div>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================= PACKAGE ================= -->
+
+<section id="packagePage" class="page">
+
+    <div class="section-title">
+        <h2>🎁 Paket Hemat</h2>
+    </div>
+
+    <div id="packageGrid" class="package-grid"></div>
+
+</section>
+
+<!-- ================= CART ================= -->
+
+<section id="cartPage" class="page">
+
+    <div class="section-title">
+        <h2>🛒 Keranjang</h2>
+    </div>
+
+    <div id="cartContainer"></div>
+
+</section>
+
+<!-- ================= ORDER ================= -->
+
+<section id="orderPage" class="page">
+
+    <div class="section-title">
+        <h2>📦 Pesanan Saya</h2>
+    </div>
+
+    <div id="orderContainer"></div>
+
+</section>
+
+<!-- ================= PROFILE ================= -->
+
+<section id="profilePage" class="page">
+
+    <div class="profile-card">
+        <div class="avatar">👤</div>
+        <h2 id="profileNameDisplay">Pelanggan PEDASIN</h2>
+        <p id="profilePhoneDisplay">Belum ada nomor</p>
+    </div>
+
+    <div class="section-title">
+        <h2>👤 Profil</h2>
+    </div>
+
+    <div class="admin-box">
+
+        <div class="form-group">
+            <label>Nama</label>
+            <input id="profileName" class="form-control" placeholder="Nama kamu">
+        </div>
+
+        <div class="form-group">
+            <label>No. WhatsApp</label>
+            <input id="profilePhone" class="form-control" placeholder="08xxxxxxxxxx">
+        </div>
+
+        <button class="btn btn-red" onclick="saveProfile()">
+            💾 Simpan Profil
+        </button>
+
+    </div>
+
+    <div class="admin-box">
+        <h3>📍 Lokasi PEDASIN</h3>
+        <br>
+        <button class="btn btn-red" onclick="openMaps()">
+            🗺️ Buka Google Maps
+        </button>
+    </div>
+
+    <div class="admin-box">
+        <h3>📱 Hubungi Kami</h3>
+        <br>
+        <button class="btn btn-red" onclick="openWhatsApp()">
+            💬 WhatsApp
+        </button>
+    </div>
+
+    <div class="admin-box">
+        <h3>⚙️ Admin</h3>
+        <br>
+        <button class="btn btn-red" onclick="openAdminLogin()">
+            🔐 Buka Admin
+        </button>
+    </div>
+
+</section>
+
+
+<!-- ================= ADMIN LOGIN ONLINE ================= -->
+<section id="adminLoginPage" class="page">
+    <div class="section-title">
+        <h2>🔐 Login Admin</h2>
+    </div>
+
+    <div class="admin-box">
+        <p style="color:var(--muted);margin-bottom:14px">
+            Hanya akun admin yang sudah terdaftar di Supabase yang dapat masuk.
+        </p>
+
+        <input id="adminEmail" type="email" placeholder="Email admin"
+               style="width:100%;padding:14px;border:1px solid var(--border);border-radius:14px;margin-bottom:10px;background:var(--card);color:var(--text)">
+
+        <input id="adminPassword" type="password" placeholder="Password admin"
+               style="width:100%;padding:14px;border:1px solid var(--border);border-radius:14px;margin-bottom:12px;background:var(--card);color:var(--text)">
+
+        <button class="btn btn-red" onclick="loginAdminOnline()">🔑 Masuk Admin</button>
+        <button class="btn" onclick="showPage('profilePage')" style="margin-top:8px">← Kembali</button>
+        <p id="adminLoginStatus" style="margin-top:12px;color:var(--muted)"></p>
+    </div>
+</section>
+
+<!-- ================= ADMIN ONLINE CHAT ================= -->
+<div id="adminOnlineChatBox" style="display:none">
+    <div class="admin-box">
+        <h3>💬 Chat Pelanggan Online</h3>
+        <p id="adminOnlineStatus" style="color:var(--muted);margin:8px 0"></p>
+
+        <select id="adminConversationSelect"
+                onchange="selectAdminConversation(this.value)"
+                style="width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);margin-bottom:10px">
+            <option value="">Pilih percakapan...</option>
+        </select>
+
+        <div id="adminMessages"
+             style="height:260px;overflow:auto;padding:10px;background:var(--bg);border-radius:14px;margin-bottom:10px"></div>
+
+        <div style="display:flex;gap:8px">
+            <input id="adminMessageInput" onkeydown="adminEnter(event)" placeholder="Balas pelanggan..."
+                   style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--text)">
+            <button class="btn btn-red" onclick="sendAdminMessage()">➤</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= ADMIN ================= -->
+
+<section id="adminPage" class="page">
+
+    <div class="section-title">
+        <h2>⚙️ Admin PEDASIN</h2>
+    </div>
+
+    <div class="admin-box">
+        <h3>📊 Statistik</h3>
+        <br>
+        <p>Total produk: <b id="adminProductCount"></b></p>
+        <p>Isi keranjang: <b id="adminCartCount"></b></p>
+        <p>Wishlist: <b id="adminWishCount"></b></p>
+    </div>
+
+    <div id="adminOnlineChatMount"></div>
+
+    <div class="admin-box">
+        <h3>💰 Atur Harga & Stok</h3>
+        <br>
+        <div id="adminProducts"></div>
+    </div>
+
+    <div class="admin-box">
+        <button class="btn btn-red" onclick="resetData()">
+            🗑️ Reset Data
+        </button>
+
+        <button class="btn" onclick="logoutAdminOnline()" style="margin-top:8px">
+            🚪 Logout Admin
+        </button>
+    </div>
+
+</section>
+
+<!-- CHAT -->
+
+<button class="chat-float" onclick="toggleChat()">💬</button>
+
+<div id="chatWindow" class="chat-window">
+
+    <div class="chat-header">
+        🤖 PEDASIN Assistant
+    </div>
+
+    <div id="chatBody" class="chat-body">
+        <div class="chat-message bot">
+            Halo! 👋 Ada yang bisa kami bantu?
+        </div>
+
+        <div class="chat-message bot">
+            Kamu bisa bertanya tentang produk, promo, atau pesanan.
+        </div>
+    </div>
+
+    <div class="chat-input">
+        <input id="chatInput" placeholder="Tulis pesan..." onkeydown="chatEnter(event)">
+        <button class="chat-send" onclick="sendChat()">➤</button>
+    </div>
+
+</div>
+
+<!-- LIVE NOTIFICATION -->
+
+<div id="liveNotification" class="live-notification"></div>
+
+<!-- TOAST -->
+
+<div id="toast" class="toast"></div>
+
+<!-- BOTTOM NAV -->
+
+<nav class="bottom-nav">
+
+    <button class="nav-btn active" onclick="showPage('homePage',this)">
+        <span class="nav-icon">🏠</span>
+        Home
+    </button>
+
+    <button class="nav-btn" onclick="showPage('productsPage',this)">
+        <span class="nav-icon">🛍️</span>
+        Produk
+    </button>
+
+    <button class="nav-btn" onclick="showPage('packagePage',this)">
+        <span class="nav-icon">🎁</span>
+        Paket
+    </button>
+
+    <button class="nav-btn" onclick="showPage('cartPage',this)">
+        <span class="nav-icon">🛒</span>
+        Keranjang
+    </button>
+
+    <button class="nav-btn" onclick="showPage('profilePage',this)">
+        <span class="nav-icon">👤</span>
+        Profil
+    </button>
+
+</nav>
+
+
+
+<script src="app.js"></script>
+</body>
+</html>
