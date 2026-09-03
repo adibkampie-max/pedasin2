@@ -1,93 +1,300 @@
 // ======================================================
-// PEDASIN - CUSTOMER ↔ ADMIN REALTIME CHAT
+// PEDASIN CHAT
 // app.js
 // ======================================================
 
-const SUPABASE_URL = "MASUKKAN_SUPABASE_URL";
+
+// ======================================================
+// SUPABASE CONFIG
+// ======================================================
+
+const SUPABASE_URL = "MASUKKAN_PROJECT_URL";
+
 const SUPABASE_KEY = "MASUKKAN_PUBLISHABLE_KEY";
 
-const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
 
 // ======================================================
 // STATE
 // ======================================================
 
 let currentUser = null;
+
+let currentProfile = null;
+
 let currentConversation = null;
+
 let realtimeChannel = null;
 
+let adminConversationChannel = null;
+
+
 // ======================================================
-// CEK LOGIN
+// ELEMENT
 // ======================================================
 
-async function checkLogin() {
-    const {
-        data: { user },
-        error
-    } = await supabaseClient.auth.getUser();
+const authSection =
+    document.getElementById("authSection");
 
-    if (error) {
-        console.error(error);
-        return null;
-    }
+const customerSection =
+    document.getElementById("customerSection");
 
-    currentUser = user;
-    return user;
+const adminSection =
+    document.getElementById("adminSection");
+
+const userEmail =
+    document.getElementById("userEmail");
+
+const logoutBtn =
+    document.getElementById("logoutBtn");
+
+
+// ======================================================
+// TOAST
+// ======================================================
+
+function showToast(message) {
+
+    const toast =
+        document.getElementById("toast");
+
+    toast.textContent = message;
+
+    toast.classList.add("show");
+
+    setTimeout(() => {
+
+        toast.classList.remove("show");
+
+    }, 3000);
 }
 
+
 // ======================================================
-// REGISTER CUSTOMER
+// LOADING
 // ======================================================
 
-async function registerCustomer(email, password) {
+function setLoading(status) {
 
-    const { data, error } =
+    document.getElementById(
+        "loading"
+    ).style.display =
+        status ? "flex" : "none";
+}
+
+
+// ======================================================
+// LOGIN / REGISTER SWITCH
+// ======================================================
+
+function showRegister() {
+
+    document.getElementById(
+        "loginBox"
+    ).style.display = "none";
+
+    document.getElementById(
+        "registerBox"
+    ).style.display = "block";
+}
+
+
+function showLogin() {
+
+    document.getElementById(
+        "registerBox"
+    ).style.display = "none";
+
+    document.getElementById(
+        "loginBox"
+    ).style.display = "block";
+}
+
+
+// ======================================================
+// REGISTER
+// ======================================================
+
+async function handleRegister() {
+
+    const name =
+        document.getElementById(
+            "registerName"
+        ).value.trim();
+
+    const email =
+        document.getElementById(
+            "registerEmail"
+        ).value.trim();
+
+    const password =
+        document.getElementById(
+            "registerPassword"
+        ).value;
+
+
+    if (!name) {
+
+        showToast(
+            "Masukkan nama kamu."
+        );
+
+        return;
+    }
+
+
+    if (!email) {
+
+        showToast(
+            "Masukkan email."
+        );
+
+        return;
+    }
+
+
+    if (password.length < 6) {
+
+        showToast(
+            "Password minimal 6 karakter."
+        );
+
+        return;
+    }
+
+
+    setLoading(true);
+
+
+    const {
+        data,
+        error
+    } =
         await supabaseClient.auth.signUp({
+
             email: email,
-            password: password
+
+            password: password,
+
+            options: {
+
+                data: {
+                    full_name: name
+                }
+
+            }
+
         });
 
+
+    setLoading(false);
+
+
     if (error) {
-        alert(error.message);
-        return null;
+
+        console.error(error);
+
+        showToast(
+            error.message
+        );
+
+        return;
     }
 
-    alert(
-        "Akun berhasil dibuat. Silakan login."
+
+    showToast(
+        "Akun berhasil dibuat."
     );
 
-    return data.user;
+
+    if (data.session) {
+
+        await loadApplication();
+
+    } else {
+
+        showToast(
+            "Cek email untuk konfirmasi akun."
+        );
+
+        showLogin();
+
+    }
 }
+
 
 // ======================================================
 // LOGIN
 // ======================================================
 
-async function loginUser(email, password) {
+async function handleLogin() {
 
-    const { data, error } =
-        await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: password
-        });
+    const email =
+        document.getElementById(
+            "loginEmail"
+        ).value.trim();
 
-    if (error) {
-        alert(error.message);
-        return null;
+    const password =
+        document.getElementById(
+            "loginPassword"
+        ).value;
+
+
+    if (!email || !password) {
+
+        showToast(
+            "Email dan password wajib diisi."
+        );
+
+        return;
     }
 
-    currentUser = data.user;
 
-    console.log(
-        "Login berhasil:",
-        currentUser.email
-    );
+    setLoading(true);
 
-    return currentUser;
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth
+            .signInWithPassword({
+
+                email: email,
+
+                password: password
+
+            });
+
+
+    setLoading(false);
+
+
+    if (error) {
+
+        console.error(error);
+
+        showToast(
+            error.message
+        );
+
+        return;
+    }
+
+
+    currentUser =
+        data.user;
+
+
+    await loadApplication();
 }
+
 
 // ======================================================
 // LOGOUT
@@ -95,106 +302,399 @@ async function loginUser(email, password) {
 
 async function logoutUser() {
 
-    const { error } =
-        await supabaseClient.auth.signOut();
-
-    if (error) {
-        alert(error.message);
-        return;
-    }
-
-    currentUser = null;
-    currentConversation = null;
-
     if (realtimeChannel) {
-        await supabaseClient.removeChannel(
-            realtimeChannel
-        );
+
+        await supabaseClient
+            .removeChannel(
+                realtimeChannel
+            );
+
         realtimeChannel = null;
     }
 
-    location.reload();
+
+    if (adminConversationChannel) {
+
+        await supabaseClient
+            .removeChannel(
+                adminConversationChannel
+            );
+
+        adminConversationChannel = null;
+    }
+
+
+    await supabaseClient.auth.signOut();
+
+
+    currentUser = null;
+
+    currentProfile = null;
+
+    currentConversation = null;
+
+
+    customerSection.style.display =
+        "none";
+
+    adminSection.style.display =
+        "none";
+
+    authSection.style.display =
+        "flex";
+
+    logoutBtn.style.display =
+        "none";
+
+    userEmail.textContent =
+        "Belum login";
+
+
+    showToast(
+        "Berhasil logout."
+    );
 }
 
+
 // ======================================================
-// BUAT CONVERSATION CUSTOMER
+// LOAD PROFILE
 // ======================================================
 
-async function createConversation(customerName) {
+async function loadProfile() {
 
     if (!currentUser) {
-        alert("Silakan login terlebih dahulu.");
         return null;
     }
 
-    // Cek apakah customer sudah punya conversation
-    const { data: existing, error: findError } =
+
+    const {
+        data,
+        error
+    } =
         await supabaseClient
-            .from("conversations")
+            .from("profiles")
             .select("*")
-            .eq("customer_id", currentUser.id)
-            .limit(1)
+            .eq(
+                "id",
+                currentUser.id
+            )
             .maybeSingle();
 
-    if (findError) {
-        console.error(findError);
-        alert(findError.message);
-        return null;
-    }
-
-    if (existing) {
-        currentConversation = existing;
-        return existing;
-    }
-
-    // Buat conversation baru
-    const { data, error } =
-        await supabaseClient
-            .from("conversations")
-            .insert({
-                customer_id: currentUser.id,
-                customer_name: customerName
-            })
-            .select()
-            .single();
 
     if (error) {
+
         console.error(error);
-        alert(error.message);
+
         return null;
     }
 
-    currentConversation = data;
+
+    currentProfile = data;
 
     return data;
 }
 
+
 // ======================================================
-// KIRIM PESAN CUSTOMER
+// LOAD APPLICATION
 // ======================================================
 
-async function sendCustomerMessage(message) {
+async function loadApplication() {
+
+    setLoading(true);
+
+
+    await loadProfile();
+
+
+    authSection.style.display =
+        "none";
+
+
+    logoutBtn.style.display =
+        "inline-block";
+
+
+    userEmail.textContent =
+        currentUser.email;
+
+
+    if (
+        currentProfile &&
+        currentProfile.role === "admin"
+    ) {
+
+        customerSection.style.display =
+            "none";
+
+        adminSection.style.display =
+            "block";
+
+
+        await loadAdminConversations();
+
+        startAdminRealtime();
+
+    } else {
+
+        adminSection.style.display =
+            "none";
+
+        customerSection.style.display =
+            "block";
+
+
+        await startCustomerChat();
+
+    }
+
+
+    setLoading(false);
+}
+
+
+// ======================================================
+// CUSTOMER CHAT
+// ======================================================
+
+async function startCustomerChat() {
 
     if (!currentUser) {
-        alert("Silakan login.");
         return;
     }
+
+
+    // Cari conversation customer
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("conversations")
+            .select("*")
+            .eq(
+                "customer_id",
+                currentUser.id
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            )
+            .limit(1)
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(error);
+
+        showToast(
+            "Gagal mengambil chat."
+        );
+
+        return;
+    }
+
+
+    if (data) {
+
+        currentConversation =
+            data;
+
+    } else {
+
+        // Ambil nama dari metadata
+        const customerName =
+            currentUser.user_metadata
+                ?.full_name ||
+            "Customer";
+
+
+        const {
+            data: newConversation,
+            error: createError
+        } =
+            await supabaseClient
+                .from("conversations")
+                .insert({
+
+                    customer_id:
+                        currentUser.id,
+
+                    customer_name:
+                        customerName
+
+                })
+                .select()
+                .single();
+
+
+        if (createError) {
+
+            console.error(
+                createError
+            );
+
+            showToast(
+                "Gagal membuat chat."
+            );
+
+            return;
+        }
+
+
+        currentConversation =
+            newConversation;
+    }
+
+
+    await loadCustomerMessages();
+
+    startCustomerRealtime();
+}
+
+
+// ======================================================
+// LOAD CUSTOMER MESSAGES
+// ======================================================
+
+async function loadCustomerMessages() {
 
     if (!currentConversation) {
-        alert("Conversation belum dibuat.");
         return;
     }
 
-    message = message.trim();
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .select("*")
+            .eq(
+                "conversation_id",
+                currentConversation.id
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (error) {
+
+        console.error(error);
+
+        return;
+    }
+
+
+    const box =
+        document.getElementById(
+            "customerMessages"
+        );
+
+
+    box.innerHTML = "";
+
+
+    if (!data || data.length === 0) {
+
+        box.innerHTML = `
+            <div class="empty-chat">
+                Belum ada pesan.<br>
+                Silakan mulai chat dengan Admin.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    data.forEach(
+        message => {
+
+            addCustomerMessage(
+                message
+            );
+
+        }
+    );
+}
+
+
+// ======================================================
+// DISPLAY CUSTOMER MESSAGE
+// ======================================================
+
+function addCustomerMessage(message) {
+
+    const box =
+        document.getElementById(
+            "customerMessages"
+        );
+
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.className =
+        message.sender_role === "customer"
+            ? "message customer"
+            : "message admin";
+
+
+    div.textContent =
+        message.body;
+
+
+    box.appendChild(div);
+
+
+    box.scrollTop =
+        box.scrollHeight;
+}
+
+
+// ======================================================
+// SEND CUSTOMER MESSAGE
+// ======================================================
+
+async function sendCustomerMessage(
+    message
+) {
+
+    if (!currentUser ||
+        !currentConversation) {
+
+        return;
+    }
+
+
+    message =
+        message.trim();
+
 
     if (!message) {
         return;
     }
 
-    const { error } =
+
+    const {
+        error
+    } =
         await supabaseClient
             .from("messages")
             .insert({
+
                 conversation_id:
                     currentConversation.id,
 
@@ -206,28 +706,308 @@ async function sendCustomerMessage(message) {
 
                 body:
                     message
+
             });
 
+
     if (error) {
+
         console.error(error);
-        alert(error.message);
+
+        showToast(
+            error.message
+        );
+
         return;
     }
 
-    document.getElementById("messageInput").value = "";
+
+    document.getElementById(
+        "customerInput"
+    ).value = "";
 }
 
+
 // ======================================================
-// AMBIL PESAN
+// CUSTOMER REALTIME
 // ======================================================
 
-async function loadMessages() {
+function startCustomerRealtime() {
 
     if (!currentConversation) {
         return;
     }
 
-    const { data, error } =
+
+    if (realtimeChannel) {
+
+        supabaseClient
+            .removeChannel(
+                realtimeChannel
+            );
+
+    }
+
+
+    realtimeChannel =
+        supabaseClient
+            .channel(
+                "customer-chat-" +
+                currentConversation.id
+            )
+            .on(
+
+                "postgres_changes",
+
+                {
+
+                    event: "INSERT",
+
+                    schema: "public",
+
+                    table: "messages",
+
+                    filter:
+                        "conversation_id=eq." +
+                        currentConversation.id
+
+                },
+
+                payload => {
+
+                    addCustomerMessage(
+                        payload.new
+                    );
+
+                }
+
+            )
+            .subscribe(
+                status => {
+
+                    console.log(
+                        "Customer realtime:",
+                        status
+                    );
+
+                }
+            );
+}
+
+
+// ======================================================
+// ADMIN CONVERSATIONS
+// ======================================================
+
+async function loadAdminConversations() {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("conversations")
+            .select("*")
+            .order(
+                "updated_at",
+                {
+                    ascending: false
+                }
+            );
+
+
+    if (error) {
+
+        console.error(error);
+
+        showToast(
+            error.message
+        );
+
+        return;
+    }
+
+
+    const list =
+        document.getElementById(
+            "conversationList"
+        );
+
+
+    list.innerHTML = "";
+
+
+    const count =
+        document.getElementById(
+            "customerCount"
+        );
+
+
+    count.textContent =
+        `${data.length} chat`;
+
+
+    if (data.length === 0) {
+
+        list.innerHTML = `
+            <div class="empty-list">
+                Belum ada customer.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    data.forEach(
+        conversation => {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "conversation-item";
+
+
+            item.dataset.id =
+                conversation.id;
+
+
+            item.innerHTML = `
+
+                <div class="conversation-name">
+
+                    👤
+                    ${escapeHTML(
+                        conversation.customer_name ||
+                        "Customer"
+                    )}
+
+                </div>
+
+                <div class="conversation-email">
+
+                    Customer ID:
+                    ${conversation.customer_id}
+
+                </div>
+
+            `;
+
+
+            item.onclick =
+                () => {
+
+                    openAdminConversation(
+                        conversation
+                    );
+
+                };
+
+
+            list.appendChild(item);
+
+        }
+    );
+}
+
+
+// ======================================================
+// OPEN ADMIN CHAT
+// ======================================================
+
+async function openAdminConversation(
+    conversation
+) {
+
+    currentConversation =
+        conversation;
+
+
+    document
+        .querySelectorAll(
+            ".conversation-item"
+        )
+        .forEach(
+            item => {
+
+                item.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    const selected =
+        document.querySelector(
+            `[data-id="${conversation.id}"]`
+        );
+
+
+    if (selected) {
+
+        selected.classList.add(
+            "active"
+        );
+
+    }
+
+
+    document.getElementById(
+        "adminChatHeader"
+    ).innerHTML = `
+
+        <h2>
+            💬
+            ${escapeHTML(
+                conversation.customer_name ||
+                "Customer"
+            )}
+        </h2>
+
+        <span class="online">
+            ● Customer
+        </span>
+
+    `;
+
+
+    document.getElementById(
+        "adminInput"
+    ).disabled = false;
+
+
+    document.getElementById(
+        "adminSendBtn"
+    ).disabled = false;
+
+
+    await loadAdminMessages();
+
+
+    startAdminChatRealtime();
+}
+
+
+// ======================================================
+// LOAD ADMIN MESSAGES
+// ======================================================
+
+async function loadAdminMessages() {
+
+    if (!currentConversation) {
+        return;
+    }
+
+
+    const {
+        data,
+        error
+    } =
         await supabaseClient
             .from("messages")
             .select("*")
@@ -235,304 +1015,118 @@ async function loadMessages() {
                 "conversation_id",
                 currentConversation.id
             )
-            .order("created_at", {
-                ascending: true
-            });
+            .order(
+                "created_at",
+                {
+                    ascending: true
+                }
+            );
+
 
     if (error) {
+
         console.error(error);
+
         return;
     }
 
-    const chatBox =
-        document.getElementById("chatMessages");
 
-    if (!chatBox) return;
+    const box =
+        document.getElementById(
+            "adminMessages"
+        );
 
-    chatBox.innerHTML = "";
 
-    data.forEach(message => {
+    box.innerHTML = "";
 
-        addMessageToScreen(message);
 
-    });
+    if (!data || data.length === 0) {
+
+        box.innerHTML = `
+            <div class="empty-chat">
+                Belum ada pesan.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    data.forEach(
+        message => {
+
+            addAdminMessage(
+                message
+            );
+
+        }
+    );
 }
 
+
 // ======================================================
-// TAMPILKAN PESAN
+// DISPLAY ADMIN MESSAGE
 // ======================================================
 
-function addMessageToScreen(message) {
+function addAdminMessage(message) {
 
-    const chatBox =
-        document.getElementById("chatMessages");
+    const box =
+        document.getElementById(
+            "adminMessages"
+        );
 
-    if (!chatBox) return;
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     div.className =
-        message.sender_role === "customer"
+        message.sender_role === "admin"
             ? "message customer"
             : "message admin";
+
 
     div.textContent =
         message.body;
 
-    chatBox.appendChild(div);
 
-    chatBox.scrollTop =
-        chatBox.scrollHeight;
+    box.appendChild(div);
+
+
+    box.scrollTop =
+        box.scrollHeight;
 }
 
-// ======================================================
-// REALTIME CHAT
-// ======================================================
-
-function startRealtimeChat() {
-
-    if (!currentConversation) {
-        return;
-    }
-
-    // Hapus channel lama
-    if (realtimeChannel) {
-
-        supabaseClient.removeChannel(
-            realtimeChannel
-        );
-
-    }
-
-    realtimeChannel =
-        supabaseClient
-            .channel(
-                "chat-" +
-                currentConversation.id
-            )
-            .on(
-                "postgres_changes",
-                {
-                    event: "INSERT",
-                    schema: "public",
-                    table: "messages",
-                    filter:
-                        "conversation_id=eq." +
-                        currentConversation.id
-                },
-                payload => {
-
-                    console.log(
-                        "Pesan baru:",
-                        payload.new
-                    );
-
-                    addMessageToScreen(
-                        payload.new
-                    );
-
-                }
-            )
-            .subscribe(status => {
-
-                console.log(
-                    "Realtime:",
-                    status
-                );
-
-            });
-}
 
 // ======================================================
-// MULAI CHAT CUSTOMER
+// SEND ADMIN MESSAGE
 // ======================================================
 
-async function startCustomerChat(
-    customerName
+async function sendAdminMessage(
+    message
 ) {
 
-    await checkLogin();
-
-    if (!currentUser) {
-
-        alert(
-            "Customer harus login terlebih dahulu."
-        );
+    if (!currentUser ||
+        !currentConversation) {
 
         return;
     }
 
-    const conversation =
-        await createConversation(
-            customerName
-        );
-
-    if (!conversation) {
-        return;
-    }
-
-    currentConversation =
-        conversation;
-
-    await loadMessages();
-
-    startRealtimeChat();
-
-    console.log(
-        "Chat customer aktif"
-    );
-}
-
-// ======================================================
-// CEK APAKAH USER ADMIN
-// ======================================================
-
-async function isAdmin() {
-
-    if (!currentUser) {
-        return false;
-    }
-
-    const { data, error } =
-        await supabaseClient
-            .from("profiles")
-            .select("role")
-            .eq("id", currentUser.id)
-            .maybeSingle();
-
-    if (error) {
-        console.error(error);
-        return false;
-    }
-
-    return data?.role === "admin";
-}
-
-// ======================================================
-// ADMIN - AMBIL SEMUA CHAT
-// ======================================================
-
-async function loadAdminConversations() {
-
-    if (!currentUser) {
-        return [];
-    }
-
-    if (!(await isAdmin())) {
-
-        alert(
-            "Akun ini bukan admin."
-        );
-
-        return [];
-    }
-
-    const { data, error } =
-        await supabaseClient
-            .from("conversations")
-            .select("*")
-            .order("updated_at", {
-                ascending: false
-            });
-
-    if (error) {
-
-        console.error(error);
-        alert(error.message);
-
-        return [];
-
-    }
-
-    return data || [];
-}
-
-// ======================================================
-// ADMIN - BUKA CHAT CUSTOMER
-// ======================================================
-
-async function openAdminConversation(
-    conversationId
-) {
-
-    if (!(await isAdmin())) {
-
-        alert(
-            "Akses admin diperlukan."
-        );
-
-        return;
-
-    }
-
-    const { data, error } =
-        await supabaseClient
-            .from("conversations")
-            .select("*")
-            .eq("id", conversationId)
-            .single();
-
-    if (error) {
-
-        console.error(error);
-        return;
-
-    }
-
-    currentConversation =
-        data;
-
-    await loadMessages();
-
-    startRealtimeChat();
-
-}
-
-// ======================================================
-// ADMIN - KIRIM PESAN
-// ======================================================
-
-async function sendAdminMessage(message) {
-
-    if (!currentUser) {
-
-        alert(
-            "Silakan login sebagai admin."
-        );
-
-        return;
-
-    }
-
-    if (!(await isAdmin())) {
-
-        alert(
-            "Akun bukan admin."
-        );
-
-        return;
-
-    }
-
-    if (!currentConversation) {
-
-        alert(
-            "Pilih chat customer terlebih dahulu."
-        );
-
-        return;
-
-    }
 
     message =
         message.trim();
+
 
     if (!message) {
         return;
     }
 
-    const { error } =
+
+    const {
+        error
+    } =
         await supabaseClient
             .from("messages")
             .insert({
@@ -551,73 +1145,200 @@ async function sendAdminMessage(message) {
 
             });
 
+
     if (error) {
 
         console.error(error);
-        alert(error.message);
+
+        showToast(
+            error.message
+        );
 
         return;
+    }
+
+
+    document.getElementById(
+        "adminInput"
+    ).value = "";
+}
+
+
+// ======================================================
+// ADMIN CHAT REALTIME
+// ======================================================
+
+function startAdminChatRealtime() {
+
+    if (!currentConversation) {
+        return;
+    }
+
+
+    if (adminConversationChannel) {
+
+        supabaseClient
+            .removeChannel(
+                adminConversationChannel
+            );
 
     }
 
-    const input =
-        document.getElementById(
-            "messageInput"
-        );
 
-    if (input) {
-        input.value = "";
+    adminConversationChannel =
+        supabaseClient
+            .channel(
+                "admin-chat-" +
+                currentConversation.id
+            )
+            .on(
+
+                "postgres_changes",
+
+                {
+
+                    event: "INSERT",
+
+                    schema: "public",
+
+                    table: "messages",
+
+                    filter:
+                        "conversation_id=eq." +
+                        currentConversation.id
+
+                },
+
+                payload => {
+
+                    addAdminMessage(
+                        payload.new
+                    );
+
+                }
+
+            )
+            .subscribe();
+}
+
+
+// ======================================================
+// ADMIN LIST REALTIME
+// ======================================================
+
+function startAdminRealtime() {
+
+    if (realtimeChannel) {
+
+        supabaseClient
+            .removeChannel(
+                realtimeChannel
+            );
+
     }
+
+
+    realtimeChannel =
+        supabaseClient
+            .channel(
+                "admin-conversations"
+            )
+            .on(
+
+                "postgres_changes",
+
+                {
+
+                    event: "*",
+
+                    schema: "public",
+
+                    table: "conversations"
+
+                },
+
+                async () => {
+
+                    await loadAdminConversations();
+
+                }
+
+            )
+            .subscribe();
 }
 
+
 // ======================================================
-// EVENT FORM CHAT
+// HTML SECURITY
 // ======================================================
 
-function setupChatForm() {
+function escapeHTML(text) {
 
-    const form =
-        document.getElementById(
-            "chatForm"
+    const div =
+        document.createElement(
+            "div"
         );
 
-    if (!form) return;
+    div.textContent =
+        text || "";
 
-    form.addEventListener(
-        "submit",
-        async function(event) {
-
-            event.preventDefault();
-
-            const input =
-                document.getElementById(
-                    "messageInput"
-                );
-
-            if (!input) return;
-
-            const message =
-                input.value.trim();
-
-            if (!message) return;
-
-            if (await isAdmin()) {
-
-                await sendAdminMessage(
-                    message
-                );
-
-            } else {
-
-                await sendCustomerMessage(
-                    message
-                );
-
-            }
-
-        }
-    );
+    return div.innerHTML;
 }
+
+
+// ======================================================
+// CUSTOMER FORM
+// ======================================================
+
+document.getElementById(
+    "customerForm"
+).addEventListener(
+    "submit",
+    async event => {
+
+        event.preventDefault();
+
+
+        const input =
+            document.getElementById(
+                "customerInput"
+            );
+
+
+        await sendCustomerMessage(
+            input.value
+        );
+
+    }
+);
+
+
+// ======================================================
+// ADMIN FORM
+// ======================================================
+
+document.getElementById(
+    "adminForm"
+).addEventListener(
+    "submit",
+    async event => {
+
+        event.preventDefault();
+
+
+        const input =
+            document.getElementById(
+                "adminInput"
+            );
+
+
+        await sendAdminMessage(
+            input.value
+        );
+
+    }
+);
+
 
 // ======================================================
 // AUTH STATE
@@ -627,31 +1348,55 @@ supabaseClient.auth.onAuthStateChange(
     async (event, session) => {
 
         console.log(
-            "Auth:",
+            "Auth event:",
             event
         );
 
+
+        if (session?.user) {
+
+            currentUser =
+                session.user;
+
+        }
+
+    }
+);
+
+
+// ======================================================
+// START APP
+// ======================================================
+
+async function startApp() {
+
+    setLoading(true);
+
+
+    const {
+        data
+    } =
+        await supabaseClient.auth
+            .getSession();
+
+
+    if (data.session?.user) {
+
         currentUser =
-            session?.user || null;
+            data.session.user;
+
+        await loadApplication();
+
+    } else {
+
+        authSection.style.display =
+            "flex";
 
     }
-);
 
-// ======================================================
-// START
-// ======================================================
 
-document.addEventListener(
-    "DOMContentLoaded",
-    async () => {
+    setLoading(false);
+}
 
-        await checkLogin();
 
-        setupChatForm();
-
-        console.log(
-            "PEDASIN Chat siap."
-        );
-
-    }
-);
+startApp();
